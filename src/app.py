@@ -52,8 +52,9 @@ def header_loading() -> dict:
     for i,row in enumerate(sample.iterrows()):
         sample_druid = row[1]['druids']
         state.druid = sample_druid
-        st.subheader(f"Sample {i+1} Druid: {sample_druid}")
-        st.markdown(f"""Read [PDF](https://purl.stanford.edu/{sample_druid})""")
+        st.header(f"{row[1]['title']}")
+        st.subheader(f"Druid: {sample_druid}, {row[1]['departments']}")
+        st.markdown(f""" Read [PDF](https://purl.stanford.edu/{sample_druid})""")
         doc = nlp(row[1].abstracts)
         st.write(displacy.render(doc, style="ent"), unsafe_allow_html=True)
         entities = {}
