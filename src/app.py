@@ -33,7 +33,7 @@ def setup_spacy():
         label = row[1]["Label"]
         labels[uri] = [label,]
     entity = Entity(keywords_dict=labels, label="BIO_FAST")
-    nlp = spacy.load("en_core_web_md")
+    nlp = spacy.load("en_core_web_sm")
     nlp.add_pipe(entity)
     nlp.remove_pipe("ner")
     return nlp, entity
