@@ -1,8 +1,15 @@
+__license__ = "Apache 2"
 from streamlit.report_thread import get_report_ctx
 from streamlit.hashing import _CodeHasher
 from streamlit.server.server import Server
 
+import requests
+import datetime
+import json
+import socket
 import sqlite3
+import uuid
+
 
 class _SessionState:
     def __init__(self, session, hash_funcs):
@@ -69,26 +76,26 @@ def _get_session():
     
     return session_info.session
 
+def get_title(druid: str) -> str:
+    con = sqlite3.connect("data/druid_fast.sqlite")
+    cur = con.cursor()
+    cur.execute("SELECT title FROM Druids WHERE druid=?", (druid,))
+    result = cur.fetchone()
+    if result is not None:
+        return result[0]
+
 def save_fast_to_druid(druid: str, fast_uris: list):
     if len(fast_uris) < 1:
         return
-    con = sqlite3.connect("data/druid_fast.sqlite")
-    cur = con.cursor()
-    result = cur.execute("SELECT id FROM Druids WHERE druid=?", (druid,))
-    druid_id = result.fetchone()
-    if druid_id is None:
-        # Add druid to table
-        cur.execute("INSERT INTO Druids (druid) VALUES (?)", (druid,))
-        con.commit()
-        druid_id = cur.lastrowid
-    else:
-        druid_id = druid_id[0]
-    for url in fast_uris:
-        cur.execute("SELECT id FROM FAST WHERE url=?", (url,))
-        url_id = cur.fetchone()[0]
-        cur.execute("INSERT INTO Cataloged (druid, fast) VALUES (?,?)", 
-                   (druid_id, url_id))
-    con.commit()
-    cur.close()
-    con.close()
-    return True
+    host_name = socket.gethostname()
+    firebase_url = f'https://bio-etd-fast.firebaseio.com/{uuid.uuid4()}.json'
+    data = {
+        "druid": druid,
+        "timestamp": datetime.datetime.utcnow().isoformat(),
+        "fast_uris": fast_uris,
+        "ip": socket.gethostbyname(host_name)
+    }
+    print(firebase_url)
+    result = requests.post(firebase_url, data=json.dumps(data))
+    if result.status_code < 400:
+        return True

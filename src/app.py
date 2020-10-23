@@ -3,7 +3,6 @@ import pickle
 import spacy
 import pandas as pd
 import matplotlib.pyplot as plt
-import sqlite3
 
 from spacy import displacy
 from spacy_lookup import Entity
@@ -52,7 +51,8 @@ def header_loading() -> dict:
     for i,row in enumerate(sample.iterrows()):
         sample_druid = row[1]['druids']
         state.druid = sample_druid
-        st.header(f"{row[1]['title']}")
+        title = helpers.get_title(sample_druid)
+        st.header(f"{title}")
         st.subheader(f"Druid: {sample_druid}, {row[1]['departments']}")
         st.markdown(f""" Read [PDF](https://purl.stanford.edu/{sample_druid})""")
         doc = nlp(row[1].abstracts)
