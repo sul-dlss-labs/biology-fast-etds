@@ -7,7 +7,6 @@ import requests
 import datetime
 import json
 import socket
-import sqlite3
 import uuid
 
 
@@ -75,14 +74,6 @@ def _get_session():
         raise RuntimeError("Couldn't get your Streamlit Session object.")
     
     return session_info.session
-
-def get_title(druid: str) -> str:
-    con = sqlite3.connect("data/druid_fast.sqlite")
-    cur = con.cursor()
-    cur.execute("SELECT title FROM Druids WHERE druid=?", (druid,))
-    result = cur.fetchone()
-    if result is not None:
-        return result[0]
 
 def save_fast_to_druid(druid: str, fast_uris: list):
     if len(fast_uris) < 1:

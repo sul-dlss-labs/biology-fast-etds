@@ -51,8 +51,7 @@ def header_loading() -> dict:
     for i,row in enumerate(sample.iterrows()):
         sample_druid = row[1]['druids']
         state.druid = sample_druid
-        title = helpers.get_title(sample_druid)
-        st.header(f"{title}")
+        st.header(f"{row[1]['title']}")
         st.subheader(f"Druid: {sample_druid}, {row[1]['departments']}")
         st.markdown(f""" Read [PDF](https://purl.stanford.edu/{sample_druid})""")
         doc = nlp(row[1].abstracts)
