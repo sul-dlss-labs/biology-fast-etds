@@ -95,7 +95,6 @@ def save_fast_to_druid(druid: str, fast_uris: list):
         "fast_uris": fast_uris,
         "ip": socket.gethostbyname(host_name)
     }
-    print(firebase_url)
     result = requests.post(firebase_url, data=json.dumps(data))
     if result.status_code < 400:
         return True
