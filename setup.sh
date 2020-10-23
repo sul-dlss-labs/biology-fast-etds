@@ -11,4 +11,4 @@ headless = true\n\
 port = $PORT\n\
 " > ~/.streamlit/config.toml
 
-python -m spacy download en_core_web_md
+python -m spacy download en_core_web_sm
