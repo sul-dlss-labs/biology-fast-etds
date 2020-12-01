@@ -8,6 +8,7 @@ import datetime
 import json
 import socket
 import uuid
+import sys
 
 
 class _SessionState:
@@ -30,7 +31,7 @@ class _SessionState:
     def __getitem__(self, item):
         """Return a saved state value, None if item is undefined."""
         return self._state["data"].get(item, None)
-        
+
     def __getattr__(self, item):
         """Return a saved state value, None if item is undefined."""
         return self._state["data"].get(item, None)
@@ -42,12 +43,12 @@ class _SessionState:
     def __setattr__(self, item, value):
         """Set state value."""
         self._state["data"][item] = value
-    
+
     def clear(self):
         """Clear session state and request a rerun."""
         self._state["data"].clear()
         self._state["session"].request_rerun()
-    
+
     def sync(self):
         """Rerun the app with all state values up to date from the beginning to fix rollbacks."""
 
@@ -57,22 +58,22 @@ class _SessionState:
         # Example: state.value += 1
         if self._state["is_rerun"]:
             self._state["is_rerun"] = False
-        
+
         elif self._state["hash"] is not None:
             if self._state["hash"] != self._state["hasher"].to_bytes(self._state["data"], None):
                 self._state["is_rerun"] = True
                 self._state["session"].request_rerun()
 
         self._state["hash"] = self._state["hasher"].to_bytes(self._state["data"], None)
-        
-        
+
+
 def _get_session():
     session_id = get_report_ctx().session_id
     session_info = Server.get_current()._get_session_info(session_id)
 
     if session_info is None:
         raise RuntimeError("Couldn't get your Streamlit Session object.")
-    
+
     return session_info.session
 
 def save_fast_to_druid(druid: str, fast_uris: list):
@@ -89,3 +90,6 @@ def save_fast_to_druid(druid: str, fast_uris: list):
     result = requests.post(firebase_url, data=json.dumps(data))
     if result.status_code < 400:
         return True
+    else:
+        print(f"Error saving code: {result.status_code} error: {result.text}")
+        sys.stdout.flush()
